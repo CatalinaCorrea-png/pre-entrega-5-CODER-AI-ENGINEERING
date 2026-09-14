@@ -40,7 +40,7 @@
     },
     {
       "tipo": "AIMessage",
-      "contenido": "Ana García tuvo **3 pedidos** y el monto total gastado fue de **$14.500**."
+      "contenido": "Ana García tuvo un total de **3 pedidos**, y el monto total gastado fue de **$14.500**."
     },
     {
       "tipo": "HumanMessage",
@@ -82,7 +82,7 @@
     },
     {
       "tipo": "AIMessage",
-      "contenido": "Juan Pérez tuvo **1 pedido** y el monto total gastado fue de **$3.200**."
+      "contenido": "Juan Pérez tuvo **1 pedido**, con un total gastado de **$3.200**."
     },
     {
       "tipo": "HumanMessage",
@@ -90,7 +90,41 @@
     },
     {
       "tipo": "AIMessage",
-      "contenido": "Ana García tuvo **3 pedidos** y el monto total gastado fue de **$14.500**."
+      "contenido": "",
+      "tool_calls": [
+        {
+          "nombre": "buscar_cliente_por_nombre",
+          "argumentos": {
+            "nombre": "Ana García"
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "ToolMessage",
+      "contenido": "Cliente encontrado: 'Ana García' → cliente_id=102",
+      "herramienta": "buscar_cliente_por_nombre"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "",
+      "tool_calls": [
+        {
+          "nombre": "buscar_pedidos",
+          "argumentos": {
+            "cliente_id": 102
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "ToolMessage",
+      "contenido": "pedidos=3, total=$14500",
+      "herramienta": "buscar_pedidos"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "Ana García tuvo un total de **3 pedidos**, y el monto total gastado fue de **$14.500**."
     }
   ],
   "turno_2_memoria": [
@@ -134,7 +168,7 @@
     },
     {
       "tipo": "AIMessage",
-      "contenido": "Ana García tuvo **3 pedidos** y el monto total gastado fue de **$14.500**."
+      "contenido": "Ana García tuvo un total de **3 pedidos**, y el monto total gastado fue de **$14.500**."
     },
     {
       "tipo": "HumanMessage",
@@ -176,7 +210,7 @@
     },
     {
       "tipo": "AIMessage",
-      "contenido": "Juan Pérez tuvo **1 pedido** y el monto total gastado fue de **$3.200**."
+      "contenido": "Juan Pérez tuvo **1 pedido**, con un total gastado de **$3.200**."
     },
     {
       "tipo": "HumanMessage",
@@ -184,7 +218,41 @@
     },
     {
       "tipo": "AIMessage",
-      "contenido": "Ana García tuvo **3 pedidos** y el monto total gastado fue de **$14.500**."
+      "contenido": "",
+      "tool_calls": [
+        {
+          "nombre": "buscar_cliente_por_nombre",
+          "argumentos": {
+            "nombre": "Ana García"
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "ToolMessage",
+      "contenido": "Cliente encontrado: 'Ana García' → cliente_id=102",
+      "herramienta": "buscar_cliente_por_nombre"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "",
+      "tool_calls": [
+        {
+          "nombre": "buscar_pedidos",
+          "argumentos": {
+            "cliente_id": 102
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "ToolMessage",
+      "contenido": "pedidos=3, total=$14500",
+      "herramienta": "buscar_pedidos"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "Ana García tuvo un total de **3 pedidos**, y el monto total gastado fue de **$14.500**."
     },
     {
       "tipo": "HumanMessage",
@@ -192,7 +260,41 @@
     },
     {
       "tipo": "AIMessage",
-      "contenido": "Juan Pérez tuvo **1 pedido** y el monto total gastado fue de **$3.200**."
+      "contenido": "",
+      "tool_calls": [
+        {
+          "nombre": "buscar_cliente_por_nombre",
+          "argumentos": {
+            "nombre": "Juan Pérez"
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "ToolMessage",
+      "contenido": "Cliente encontrado: 'Juan Pérez' → cliente_id=205",
+      "herramienta": "buscar_cliente_por_nombre"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "",
+      "tool_calls": [
+        {
+          "nombre": "buscar_pedidos",
+          "argumentos": {
+            "cliente_id": 205
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "ToolMessage",
+      "contenido": "pedidos=1, total=$3200",
+      "herramienta": "buscar_pedidos"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "Juan Pérez tuvo **1 pedido**, con un total gastado de **$3.200**."
     }
   ],
   "prueba_error_y_aclaracion": [
@@ -244,7 +346,7 @@
     },
     {
       "tipo": "AIMessage",
-      "contenido": "Lamentablemente, el sistema sigue indicando que no hay ningún cliente registrado con el nombre \"Roberto Sánchez\". ¿Podrías confirmar si el nombre es correcto o si hay alguna otra forma de buscarlo?"
+      "contenido": "Lo siento, pero el sistema sigue indicando que no se encuentra ningún cliente registrado con el nombre \"Roberto Sánchez\". ¿Podrías confirmar si el nombre es correcto o si hay alguna otra forma de buscarlo?"
     }
   ]
 }

@@ -2,7 +2,7 @@
 
 Agente **ReAct** construido con LangGraph: el propio LLM decide, turno a turno, si necesita
 llamar a una herramienta o si ya puede responder. El ciclo
-`modelo → ¿tool? → herramientas → modelo → …` no está cableado con `if/else`; lo dirige una
+`agente → ¿tool? → herramientas → agente → …` no está cableado con `if/else`; lo dirige una
 arista condicional (`tools_condition`) que mira si el último mensaje del modelo trae
 `tool_calls`. El estado se guarda en SQLite, así que la conversación sobrevive al final del
 proceso.
@@ -10,11 +10,11 @@ proceso.
 | Componente | Elección |
 |---|---|
 | Grafo | `StateGraph(MessagesState)` — hereda el reducer `add_messages` |
-| Nodos | `modelo` (LLM async) + `herramientas` (`ToolNode`) |
+| Nodos | `agente` (LLM async) + `herramientas` (`ToolNode`) |
 | Ruteo | `tools_condition` → `{"tools": "herramientas", END: END}` |
-| Ciclo | `add_edge("herramientas", "modelo")` |
+| Ciclo | `add_edge("herramientas", "agente")` |
 | Herramientas | `buscar_cliente_por_nombre`, `buscar_pedidos` (`@tool`) |
-| LLM | `gemini-flash-lite-latest` (`temperature=0`) con `.bind_tools()` |
+| LLM | intercambiable: OpenAI · Anthropic · Gemini · Ollama (`temperature=0`, `.bind_tools()`) |
 | Persistencia | `AsyncSqliteSaver` sobre `checkpoints.sqlite` + `thread_id` |
 | Tope de ciclo | `recursion_limit=10` |
 
@@ -33,8 +33,8 @@ Requiere **Python 3.12**.
 
 Completar en `.env`:
 
-- `GOOGLE_API_KEY` — gratis en [Google AI Studio](https://aistudio.google.com/apikey)
-- `MODELO_LLM` — opcional, ya viene con un valor por defecto en `.env.example`
+- `LLM_PROVIDER` — `openai`, `anthropic`, `gemini` (por defecto) u `ollama`
+- la API key **solo** del proveedor elegido (`ollama` no lleva ninguna)
 
 El `.env` está en `.gitignore` y nunca se sube al repositorio.
 
@@ -52,11 +52,11 @@ Corre los tres escenarios de la consigna y deja la traza ReAct en `traza_ejecuci
 ### El grafo (`agente/grafo.py`)
 
 ```
-START ──▶ modelo ──tools_condition──▶ herramientas
+START ──▶ agente ──tools_condition──▶ herramientas
              ▲                             │
              └─────────────────────────────┘
              │
-             └──▶ END   (cuando el modelo ya no pide herramientas)
+             └──▶ END   (cuando el agente ya no pide herramientas)
 ```
 
 `MessagesState` trae el reducer `add_messages`: cada nodo devuelve `{"messages": [...]}` y
@@ -65,6 +65,38 @@ borraría las observaciones anteriores y el agente no podría encadenar dos herr
 
 El grafo termina **solo** cuando el LLM decide no llamar más herramientas: `tools_condition`
 devuelve `END` al ver un `AIMessage` sin `tool_calls`. No hay ninguna ruta manual.
+
+### El proveedor del LLM (`agente/llm.py`)
+
+El grafo no cambia según el proveedor: `bind_tools()` es parte de la interfaz `BaseChatModel`
+de LangChain, así que los cuatro se enchufan igual en el nodo `agente`. Lo único que varía es
+qué clase se instancia, con qué modelo y con qué API key.
+
+| `LLM_PROVIDER` | Clase | Modelo por defecto | API key | Paquete |
+|---|---|---|---|---|
+| `gemini` *(default)* | `ChatGoogleGenerativeAI` | `gemini-flash-lite-latest` | `GOOGLE_API_KEY` | `langchain-google-genai` |
+| `openai` | `ChatOpenAI` | `gpt-4o-mini` | `OPENAI_API_KEY` | `langchain-openai` |
+| `anthropic` | `ChatAnthropic` | `claude-haiku-4-5` | `ANTHROPIC_API_KEY` | `langchain-anthropic` |
+| `ollama` | `ChatOllama` | `llama3.1` | — (local) | `langchain-ollama` |
+
+Cada proveedor tiene **su propia** variable de modelo (`MODELO_GEMINI`, `MODELO_OPENAI`,
+`MODELO_ANTHROPIC`, `MODELO_OLLAMA`) en vez de una sola compartida: así cambiar
+`LLM_PROVIDER` no obliga a cambiar también el modelo, y no puede quedar un `gpt-4o-mini`
+apuntando a Anthropic.
+
+Los imports son perezosos —dentro de cada rama— para que no haga falta instalar los cuatro
+paquetes. `requirements.txt` trae solo el de Gemini; los otros tres están comentados ahí. Si
+elegís un proveedor sin su paquete, el error te dice exactamente qué instalar.
+
+Cambiar de proveedor es editar una línea del `.env`:
+
+```bash
+LLM_PROVIDER=anthropic     # + pip install langchain-anthropic
+```
+
+Con Ollama no hace falta API key, pero el modelo tiene que **soportar tool calling**
+(`llama3.1`, `qwen3`, `mistral-nemo`…): uno que no lo soporte nunca emite `tool_calls` y el
+ciclo ReAct termina en la primera vuelta sin llamar a ninguna herramienta.
 
 ### Las herramientas (`agente/herramientas.py`)
 
@@ -153,6 +185,7 @@ pre-entrega-5/
 ├── agente/
 │   ├── datos.py          # "base de datos" simulada (dos tablas separadas)
 │   ├── herramientas.py   # @tool con docstrings descriptivos
+│   ├── llm.py            # selección de proveedor por LLM_PROVIDER
 │   ├── grafo.py          # StateGraph(MessagesState) + LLM + ToolNode + ciclo
 │   └── traza.py          # serialización de la traza ReAct a JSON
 ├── main.py               # los tres escenarios de prueba + guardado de la traza
@@ -170,6 +203,6 @@ pre-entrega-5/
   event loop en cada nodo.
 - **`recursion_limit=10`**: techo de pasos del ciclo. Sin él, un agente que se equivoca puede
   quedar llamando herramientas indefinidamente y gastando tokens.
-- **Modelo**: `gemini-flash-lite-latest` porque la capa gratuita le da 15 pedidos por minuto
-  (contra 5 de `gemini-flash-latest`) y una corrida completa hace 8 llamadas al LLM. Se puede
-  cambiar con la variable de entorno `MODELO_LLM`.
+- **Modelo por defecto de Gemini**: `gemini-flash-lite-latest` porque la capa gratuita le da
+  15 pedidos por minuto (contra 5 de `gemini-flash-latest`) y una corrida completa hace 8
+  llamadas al LLM.

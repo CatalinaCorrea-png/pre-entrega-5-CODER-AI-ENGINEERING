@@ -5,35 +5,24 @@ El estado es `MessagesState`, que ya trae el reducer
 ciclo no pierde las observaciones de las herramientas.
 """
 
-import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, START, END, MessagesState
 from langgraph.prebuilt import ToolNode, tools_condition
 
 from agente.herramientas import herramientas
+from agente.llm import crear_llm
 
 RAIZ = Path(__file__).resolve().parent.parent
-load_dotenv(RAIZ / ".env")
-
-if not os.getenv("GOOGLE_API_KEY"):
-    raise RuntimeError(
-        "Falta la variable GOOGLE_API_KEY.\n"
-        "  1. copy .env.example .env      (cp en Linux / macOS)\n"
-        "  2. completá GOOGLE_API_KEY (gratis en https://aistudio.google.com/apikey)\n"
-        "El .env está en .gitignore: nunca se sube al repositorio."
-    )
+load_dotenv(RAIZ / ".env")  # antes de crear_llm(): de ahí salen LLM_PROVIDER y las claves
 
 # Archivo SQLite donde el checkpointer guarda el historial de cada thread_id.
 DB_CHECKPOINTS = RAIZ / "checkpoints.sqlite"
 
 # --- 1. LLM vinculado a las herramientas ---
-# El default vale también sin .env; el porqué de flash-lite está en .env.example.
-MODELO = os.getenv("MODELO_LLM", "gemini-flash-lite-latest")
-
-llm = ChatGoogleGenerativeAI(model=MODELO, temperature=0)
+# El proveedor y el modelo salen de LLM_PROVIDER y MODELO_<PROVEEDOR> (ver .env.example).
+llm, PROVEEDOR, MODELO = crear_llm()
 llm_con_herramientas = llm.bind_tools(herramientas)
 
 

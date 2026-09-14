@@ -14,7 +14,7 @@ import sys
 from langchain_core.messages import HumanMessage
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
-from agente.grafo import DB_CHECKPOINTS, RAIZ, grafo
+from agente.grafo import DB_CHECKPOINTS, MODELO, PROVEEDOR, RAIZ, grafo
 from agente.traza import extraer_texto, serializar_traza
 
 # recursion_limit: techo de pasos del ciclo. Sin él, un agente que se equivoca
@@ -32,6 +32,8 @@ def titulo(texto: str) -> None:
 
 
 async def main() -> None:
+    print(f"Proveedor: {PROVEEDOR} · modelo: {MODELO}")
+
     if "--reiniciar" in sys.argv:
         DB_CHECKPOINTS.unlink(missing_ok=True)
         print(f"Checkpoint borrado: {DB_CHECKPOINTS.name}")

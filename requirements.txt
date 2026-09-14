@@ -7,8 +7,11 @@ aiosqlite                     # backend async de SQLite
 langchain
 langchain-core
 
-# LLM
-langchain-google-genai
+# LLM: instalar solo el del proveedor que se use (ver LLM_PROVIDER en .env.example)
+langchain-google-genai        # LLM_PROVIDER=gemini  (por defecto)
+# langchain-openai            # LLM_PROVIDER=openai
+# langchain-anthropic         # LLM_PROVIDER=anthropic
+# langchain-ollama            # LLM_PROVIDER=ollama  (local, sin API key)
 
 # Utilidades
 pydantic
