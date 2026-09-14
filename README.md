@@ -47,6 +47,43 @@ python main.py --reiniciar    # borra el checkpoint y arranca la demo de cero
 
 Corre los tres escenarios de la consigna y deja la traza ReAct en `traza_ejecucion.json`.
 
+## Tests
+
+```bash
+pytest
+```
+
+38 tests, menos de un segundo, **sin una sola llamada a la API**. El LLM se reemplaza por un
+guion fijo de respuestas (`FakeMessagesListChatModel`), así que lo que se prueba es
+determinista y gratis: las herramientas, la estructura del grafo, el ciclo, la persistencia y
+la traza.
+
+| Archivo | Qué cubre |
+|---|---|
+| `test_herramientas.py` | Búsquedas, normalización del nombre, casos `ERROR:`, y el contrato que ve el LLM (nombre, descripción, tipos del esquema) |
+| `test_grafo.py` | Que el grafo compile, los nodos, la arista `herramientas → agente` que cierra el ciclo, y las dos ramas de `tools_condition` |
+| `test_ciclo_react.py` | Razonamiento multi-paso, acumulación de mensajes, respuesta sin herramientas, ciclo de retorno ante error, y el corte por `recursion_limit` |
+| `test_persistencia.py` | Historial por `thread_id`, aislamiento entre hilos, y que el estado sobreviva al cierre del checkpointer |
+| `test_traza.py` | `extraer_texto` (incluido el content en bloques de Gemini) y el JSON del entregable |
+
+Cómo se sustituye el LLM: `call_model` resuelve `llm_con_herramientas` como global de su
+módulo **en cada llamada** —no queda capturado al compilar el grafo—, así que la fixture
+`llm_falso` pisa esa variable con `monkeypatch` y el `ainvoke()` del test pasa por el guion.
+El grafo que se ejercita es **el real**, no una copia armada en el test.
+
+Como red de seguridad, una fixture `autouse` deja en el lugar del cliente de Gemini un objeto
+que falla si alguien lo usa. Los tests que piden `llm_falso` lo reemplazan por su guion; el
+que invoque el grafo sin instalar uno no gasta tokens en silencio, falla diciendo qué le
+falta. Que los 38 pasen con esa bomba armada es la prueba de que ninguno llama a la API.
+
+Los tests nunca tocan el `checkpoints.sqlite` del repo —usan un archivo temporal por test— ni
+necesitan credenciales: `conftest.py` pone una `GOOGLE_API_KEY` de mentira antes de importar
+el grafo, que alcanza para construir el cliente de Gemini sin llamarlo nunca.
+
+Lo único que **no** cubren es si el modelo real elige bien las herramientas: eso depende de
+los docstrings y solo se ve en una corrida de verdad (`python main.py`), que es la que quedó
+registrada en `traza_ejecucion.json`,  o haciendo llamadas a las APIs de modelos.
+
 ## Cómo funciona
 
 ### El grafo (`agente/grafo.py`)
@@ -155,8 +192,10 @@ pre-entrega-5/
 │   ├── herramientas.py   # @tool con docstrings descriptivos
 │   ├── grafo.py          # StateGraph(MessagesState) + LLM + ToolNode + ciclo
 │   └── traza.py          # serialización de la traza ReAct a JSON
+├── tests/                # 38 tests sin API (pytest)
 ├── main.py               # los tres escenarios de prueba + guardado de la traza
 ├── traza_ejecucion.json  # traza real de la última corrida
+├── pytest.ini
 ├── requirements.txt
 ├── .env.example
 └── .gitignore

@@ -13,3 +13,7 @@ langchain-google-genai
 # Utilidades
 pydantic
 python-dotenv
+
+# Tests (no hacen falta para correr el agente)
+pytest
+pytest-asyncio
