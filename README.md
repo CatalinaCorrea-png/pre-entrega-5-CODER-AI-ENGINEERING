@@ -2,7 +2,7 @@
 
 Agente **ReAct** construido con LangGraph: el propio LLM decide, turno a turno, si necesita
 llamar a una herramienta o si ya puede responder. El ciclo
-`modelo → ¿tool? → herramientas → modelo → …` no está cableado con `if/else`; lo dirige una
+`agente → ¿tool? → herramientas → agente → …` no está cableado con `if/else`; lo dirige una
 arista condicional (`tools_condition`) que mira si el último mensaje del modelo trae
 `tool_calls`. El estado se guarda en SQLite, así que la conversación sobrevive al final del
 proceso.
@@ -10,9 +10,9 @@ proceso.
 | Componente | Elección |
 |---|---|
 | Grafo | `StateGraph(MessagesState)` — hereda el reducer `add_messages` |
-| Nodos | `modelo` (LLM async) + `herramientas` (`ToolNode`) |
+| Nodos | `agente` (LLM async) + `herramientas` (`ToolNode`) |
 | Ruteo | `tools_condition` → `{"tools": "herramientas", END: END}` |
-| Ciclo | `add_edge("herramientas", "modelo")` |
+| Ciclo | `add_edge("herramientas", "agente")` |
 | Herramientas | `buscar_cliente_por_nombre`, `buscar_pedidos` (`@tool`) |
 | LLM | `gemini-flash-lite-latest` (`temperature=0`) con `.bind_tools()` |
 | Persistencia | `AsyncSqliteSaver` sobre `checkpoints.sqlite` + `thread_id` |
@@ -52,7 +52,7 @@ Corre los tres escenarios de la consigna y deja la traza ReAct en `traza_ejecuci
 ### El grafo (`agente/grafo.py`)
 
 ```
-START ──▶ modelo ──tools_condition──▶ herramientas
+START ──▶ agente ──tools_condition──▶ herramientas
              ▲                             │
              └─────────────────────────────┘
              │
