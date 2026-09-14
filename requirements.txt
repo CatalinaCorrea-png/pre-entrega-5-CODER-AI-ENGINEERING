@@ -1,0 +1,15 @@
+# Orquestacion del grafo ciclico
+langgraph
+langgraph-checkpoint-sqlite   # AsyncSqliteSaver
+aiosqlite                     # backend async de SQLite
+
+# Herramientas (@tool) y tipos de mensaje
+langchain
+langchain-core
+
+# LLM
+langchain-google-genai
+
+# Utilidades
+pydantic
+python-dotenv

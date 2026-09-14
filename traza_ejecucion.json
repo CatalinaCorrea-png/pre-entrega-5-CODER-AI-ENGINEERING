@@ -1,0 +1,250 @@
+{
+  "turno_1_multi_paso": [
+    {
+      "tipo": "HumanMessage",
+      "contenido": "¿Cuántos pedidos tuvo Ana García y cuál fue el total?"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "",
+      "tool_calls": [
+        {
+          "nombre": "buscar_cliente_por_nombre",
+          "argumentos": {
+            "nombre": "Ana García"
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "ToolMessage",
+      "contenido": "Cliente encontrado: 'Ana García' → cliente_id=102",
+      "herramienta": "buscar_cliente_por_nombre"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "",
+      "tool_calls": [
+        {
+          "nombre": "buscar_pedidos",
+          "argumentos": {
+            "cliente_id": 102
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "ToolMessage",
+      "contenido": "pedidos=3, total=$14500",
+      "herramienta": "buscar_pedidos"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "Ana García tuvo **3 pedidos** y el monto total gastado fue de **$14.500**."
+    },
+    {
+      "tipo": "HumanMessage",
+      "contenido": "¿Y Juan Pérez?"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "",
+      "tool_calls": [
+        {
+          "nombre": "buscar_cliente_por_nombre",
+          "argumentos": {
+            "nombre": "Juan Pérez"
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "ToolMessage",
+      "contenido": "Cliente encontrado: 'Juan Pérez' → cliente_id=205",
+      "herramienta": "buscar_cliente_por_nombre"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "",
+      "tool_calls": [
+        {
+          "nombre": "buscar_pedidos",
+          "argumentos": {
+            "cliente_id": 205
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "ToolMessage",
+      "contenido": "pedidos=1, total=$3200",
+      "herramienta": "buscar_pedidos"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "Juan Pérez tuvo **1 pedido** y el monto total gastado fue de **$3.200**."
+    },
+    {
+      "tipo": "HumanMessage",
+      "contenido": "¿Cuántos pedidos tuvo Ana García y cuál fue el total?"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "Ana García tuvo **3 pedidos** y el monto total gastado fue de **$14.500**."
+    }
+  ],
+  "turno_2_memoria": [
+    {
+      "tipo": "HumanMessage",
+      "contenido": "¿Cuántos pedidos tuvo Ana García y cuál fue el total?"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "",
+      "tool_calls": [
+        {
+          "nombre": "buscar_cliente_por_nombre",
+          "argumentos": {
+            "nombre": "Ana García"
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "ToolMessage",
+      "contenido": "Cliente encontrado: 'Ana García' → cliente_id=102",
+      "herramienta": "buscar_cliente_por_nombre"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "",
+      "tool_calls": [
+        {
+          "nombre": "buscar_pedidos",
+          "argumentos": {
+            "cliente_id": 102
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "ToolMessage",
+      "contenido": "pedidos=3, total=$14500",
+      "herramienta": "buscar_pedidos"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "Ana García tuvo **3 pedidos** y el monto total gastado fue de **$14.500**."
+    },
+    {
+      "tipo": "HumanMessage",
+      "contenido": "¿Y Juan Pérez?"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "",
+      "tool_calls": [
+        {
+          "nombre": "buscar_cliente_por_nombre",
+          "argumentos": {
+            "nombre": "Juan Pérez"
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "ToolMessage",
+      "contenido": "Cliente encontrado: 'Juan Pérez' → cliente_id=205",
+      "herramienta": "buscar_cliente_por_nombre"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "",
+      "tool_calls": [
+        {
+          "nombre": "buscar_pedidos",
+          "argumentos": {
+            "cliente_id": 205
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "ToolMessage",
+      "contenido": "pedidos=1, total=$3200",
+      "herramienta": "buscar_pedidos"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "Juan Pérez tuvo **1 pedido** y el monto total gastado fue de **$3.200**."
+    },
+    {
+      "tipo": "HumanMessage",
+      "contenido": "¿Cuántos pedidos tuvo Ana García y cuál fue el total?"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "Ana García tuvo **3 pedidos** y el monto total gastado fue de **$14.500**."
+    },
+    {
+      "tipo": "HumanMessage",
+      "contenido": "¿Y Juan Pérez?"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "Juan Pérez tuvo **1 pedido** y el monto total gastado fue de **$3.200**."
+    }
+  ],
+  "prueba_error_y_aclaracion": [
+    {
+      "tipo": "HumanMessage",
+      "contenido": "¿Cuántos pedidos tuvo el cliente Roberto Sánchez?"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "",
+      "tool_calls": [
+        {
+          "nombre": "buscar_cliente_por_nombre",
+          "argumentos": {
+            "nombre": "Roberto Sánchez"
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "ToolMessage",
+      "contenido": "ERROR: no se encontró ningún cliente con el nombre 'Roberto Sánchez'. Verificá que el nombre esté completo y bien escrito.",
+      "herramienta": "buscar_cliente_por_nombre"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "No se encontró ningún cliente registrado con el nombre \"Roberto Sánchez\". Por favor, verificá que el nombre esté bien escrito o completo."
+    },
+    {
+      "tipo": "HumanMessage",
+      "contenido": "¿Cuántos pedidos tuvo el cliente Roberto Sánchez?"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "",
+      "tool_calls": [
+        {
+          "nombre": "buscar_cliente_por_nombre",
+          "argumentos": {
+            "nombre": "Roberto Sánchez"
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "ToolMessage",
+      "contenido": "ERROR: no se encontró ningún cliente con el nombre 'Roberto Sánchez'. Verificá que el nombre esté completo y bien escrito.",
+      "herramienta": "buscar_cliente_por_nombre"
+    },
+    {
+      "tipo": "AIMessage",
+      "contenido": "Lamentablemente, el sistema sigue indicando que no hay ningún cliente registrado con el nombre \"Roberto Sánchez\". ¿Podrías confirmar si el nombre es correcto o si hay alguna otra forma de buscarlo?"
+    }
+  ]
+}

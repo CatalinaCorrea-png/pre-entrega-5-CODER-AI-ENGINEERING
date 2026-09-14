@@ -1,0 +1,19 @@
+# Claves: nunca al repositorio
+.env
+
+# Entorno virtual
+.venv/
+venv/
+
+# Checkpoints del agente (se regeneran al correr main.py)
+checkpoints.sqlite
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Sistema
+.DS_Store
+Thumbs.db
